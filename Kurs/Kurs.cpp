@@ -26,22 +26,12 @@ void CompileAndRun(HWND hwndInput, HWND hwndOutput) {
 
     // Выделяем память и извлекаем текст
     if (textLength > 0) {
-        std::ofstream codeFile("code.cpp");
-        if (codeFile.is_open()) {
-            char* buffer = new char[textLength + 1];
-            GetWindowTextA(hwndInput, buffer, textLength + 1);
-            codeFile << buffer;
-            delete[] buffer;
-            codeFile.close();
-        }
-        else {
-            MessageBoxA(NULL, "Ошибка открытия файла для записи.", "Ошибка", MB_ICONERROR);
-            return;
-        }
+        code.resize(textLength + 1);
+        GetWindowTextA(hwndInput, &code[0], textLength + 1);
     }
 
-    // Открываем файл для записи кода на C++
-    std::ofstream codeFile("code.cpp");
+    // Открываем временный файл для записи кода на C++
+    std::ofstream codeFile("temp.cpp");
 
     if (!codeFile.is_open()) {
         MessageBoxA(NULL, "Ошибка открытия файла для записи.", "Ошибка", MB_ICONERROR);
@@ -103,6 +93,10 @@ void CompileAndRun(HWND hwndInput, HWND hwndOutput) {
     if (runResult != 0) {
         MessageBoxA(NULL, "Ошибка выполнения программы.", "Ошибка", MB_ICONERROR);
     }
+
+    // Удаляем временные файлы
+    std::remove("temp.cpp");
+    std::remove("output");
 }
 
 void OnSize(HWND hwnd, WPARAM wParam, LPARAM lParam) {
